@@ -1,0 +1,108 @@
+/* 变量 */
+/* 初始化一些样式 */
+html {
+  height: 100%;
+}
+body {
+  font-size: 14px;
+  color: #333;
+  height: 100%;
+}
+#app {
+  height: 100%;
+  overflow: auto;
+}
+a {
+  text-decoration: none;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+p {
+  margin: 0;
+}
+input,
+button,
+a {
+  outline: 0;
+}
+/* 按钮，线框等覆盖样式*/
+.custom-bg {
+  background: #14B7F5;
+  border-color: #14B7F5;
+}
+.custom-bg:hover,
+.custom-bg:active {
+  background: #52caf8;
+  border-color: #52caf8;
+}
+.cart-drop {
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
+}
+/*banner图的样式覆盖*/
+.el-carousel__indicators {
+  bottom: 20px;
+}
+.el-carousel__indicators .el-carousel__indicator {
+  padding: 0 4px;
+}
+.el-carousel__indicators .el-carousel__indicator.is-active .el-carousel__button {
+  background: #ffabbe;
+}
+.el-carousel__indicators .el-carousel__button {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid #ffabbe;
+}
+/* 覆盖表单 */
+.sign-form .el-input__inner {
+  height: 53px;
+  line-height: 53px;
+  border: 0;
+  padding-left: 10px;
+  color: #666;
+}
+.sign-form .el-form-item__label {
+  line-height: 53px;
+  padding: 0;
+  color: #666;
+}
+.sign-form .el-form-item__label::before {
+  content: "" !important;
+}
+.sign-form .protocol .el-form-item__label {
+  line-height: 1;
+}
+.sign-form .protocol .el-form-item__content {
+  margin-left: 0!important;
+  line-height: 1;
+}
+.sign-form .protocol .el-form-item__error {
+  padding-left: 24px;
+}
+.sign-form .has_checked .el-checkbox__inner:hover {
+  border-color: #666;
+}
+.sign-form .has_checked .el-checkbox__input.is-checked .el-checkbox__inner,
+.sign-form .has_checked .el-checkbox__input.is-focus .el-checkbox__inner {
+  background-color: #fff;
+  border-color: #666;
+}
+.sign-form .has_checked .el-checkbox__input.is-checked .el-checkbox__inner:after,
+.sign-form .has_checked .el-checkbox__input.is-focus .el-checkbox__inner:after {
+  border-color: #666;
+}
+/*# sourceMappingURL=common.css.map */

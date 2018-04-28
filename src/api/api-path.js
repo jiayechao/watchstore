@@ -1,0 +1,51 @@
+// api_path 配置在项目根目录 config dev.env.js 和 prod.env.js 下
+let api = process.env.API_PATH;
+const path = {
+  // ****************************** common ******************************
+  GET_PROVINCE_LIST: `${api}/wat/getProvinceList`, // 获取省
+  GET_CITY_LIST: `${api}/wat/getCityList`, // 获取市
+  GET_AREA_LIST: `${api}/wat/getAreaList`, // 获取区
+  GET_VALIDATE_CODE: `${api}/wat/getValidateCode`, // 获取验证码图片
+  GET_REGISTER_CODE: `${api}/wat/getRegisterCode`, // 获取手机验证码
+  MOBILE_REGISTER: `${api}/wat/mobileRegister`, // 手机注册
+  LOGIN: `${api}/wat/login`, // 登录
+  LOGIN_OUT: `${api}/wat/loginout`, // 登出
+  GET_BANNER_LIST: `${api}/wat/getBannerList`, // 获取banner图
+  GET_INDEX_RECOMMEND: `${api}/wat/getIndexRecommend`, // 获取首页推荐列表
+  GET_ITEM_LIST: `${api}/wat/getItemList`, // 商品列表
+  GET_ITEM_DETAIL: `${api}/wat/getItemDetail`, // 获取普通商品详情
+  DIRECT_ORDER: `${api}/wat/directOrder`, // 立即购买
+  GET_PRESALE_CART_INFO: `${api}/wat/getPresaleCartInfo`, // 抢购购买
+  PRESALE_ORDER: `${api}/wat/presaleOrder`, // 抢购下单
+  ORDER_USER_CART: `${api}/wat/orderUserCart`, // 提交订单
+  CANCEL_ORDER: `${api}/wat/cancelOrder`, // 取消订单
+  ADD_CARD: `${api}/wat/addCart`, // 添加进购物车
+  UPDATE_CART_NUM: `${api}/wat/updateCartNum`, // 修改购物车数量
+  DEL_CART: `${api}/wat/delCart`, // 删除购物车
+  GET_USER_CART: `${api}/wat/getUserCart`, // 获取购物车列表
+  ADDRESS_LIST: `${api}/wat/addressList`, // 我的收货地址列表
+  GET_ORDER_LIST: `${api}/wat/getOrderList`, // 我的订单列表
+  ADD_ADDRESS: `${api}/wat/addAddress`, // 添加收货地址
+  UPDATE_ADDRESS: `${api}/wat/updateAddress`, // 修改收获地址
+  DEL_ADDRESS: `${api}/wat/delAddress`, // 删除收货地址
+  RESET_DEFAULT_ADDRESS: `${api}/wat/resetDefaultAddress`, // 设置默认收货地址
+  INVOICE_LIST: `${api}/wat/invoiceList`, // 发票列表
+  ADD_INVOICE: `${api}/wat/addInvoice`, // 添加发票
+  UPDATE_INVOICE: `${api}/wat/updateInvoice`, // 修改发票
+  DEL_INVOICE: `${api}/wat/delInvoice`, // 删除发票
+  GET_PC_WX_PAY: `${api}/wat/getPCWxPay`, // 微信支付
+  LINK2_PC_ALIPAY: `${api}/wat/link2PCAliPay`, // 支付宝
+  QUERY_PAY_STATUS: `${api}/wat/queryPayStatus`, // 查询支付状态
+  GET_ORDER_DETAIL: `${api}/wat/getOrderDetail`, // 查询订单详情
+  GET_MY_BASE_INFO: `${api}/wat/getMyBaseInfo`, // 获取我的基本信息
+  UPDATE_NICKNAME: `${api}/wat/updateNickname`, // 修改昵称
+  UPDATE_PWD: `${api}/wat/updatePwd`, // 修改密码
+  RESET_PWD: `${api}/wat/resetPwd`, // 重置密码
+  UPDATE_HEAD_IMG: `${api}/wat/updateHeadImg`, // 修改头像
+  QUERY_DISPACH_INFO: `${api}/wat/queryDispachInfo`, // 查看物流
+  APPLY_AFTER_SALES: `${api}/wat/applyAfterSales`, // 申请售后
+  GET_AFTER_SALES_INFO: `${api}/wat/getAfterSalesInfo`, // 查看售后
+  FINISH_ORDER: `${api}/wat/finishOrder` // 确认收货
+};
+
+export default path;
