@@ -1,5 +1,11 @@
 <template>
   <div class="detail-wrap">
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/user/'+$route.params.userId+'/order_list' }">订单列表</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="detailData.orderState === 0">立即付款</el-breadcrumb-item>
+      <el-breadcrumb-item v-else-if="detailData.orderState === 7">付尾款</el-breadcrumb-item>
+      <el-breadcrumb-item v-else>查看订单</el-breadcrumb-item>
+    </el-breadcrumb>
     <p class="title"><i class="el-icon el-icon-tickets"></i>订单号：{{detailData.orderNo}}</p>
     <div class="step-wrap">
       <div class="step-item fl" :class="{achieve: item.isShow}"  v-for="(item, index) in detailData.flowList" :key="index">
@@ -21,37 +27,38 @@
       </div>
     </div>
     <div class="info-wrap">
-      <div class="fl address panel">
+      <div class="address panel">
         <p class="title"><svg-icon icon-class="my" />收货人信息</p>
         <div class="address-wrap panel-wrap">
-            <p class="receiver">收货人：{{detailData.receiver}}</p>
-            <p class="phone">手机号码：{{detailData.phone}}</p>
-            <p class="address-info">地址：{{detailData.province}}{{detailData.city}}{{detailData.area}}{{detailData.addressDetail}}</p>
+            <p class="receiver"><span class="fl">收货人：</span>{{detailData.receiver}}</p>
+            <p class="phone"><span class="fl">手机号码：</span>{{detailData.phone}}</p>
+            <div class="address-info moreText" ><span class="fl">地址：</span><p class="text">{{detailData.province}}{{detailData.city}}{{detailData.area}}{{detailData.addressDetail}}</p></div>
         </div>
       </div>
-       <div class="fl pay panel">
+       <div class="pay panel">
         <p class="title"><svg-icon icon-class="refund" />付款信息</p>
-        <div class="pay-wrap panel-wrap">
-            <p class="type">付款方式：在线支付</p>
-             <p class="total">商品总额：{{detailData.totalAmount}}</p>
-              <template v-if="detailData.orderState === 7">
-              <p class="presaleAmount">已付定金：{{detailData.presaleAmount}}</p>
-              <p class="restAmount">代付尾款金额：<span style="color:red">{{detailData.restAmount}}</span></p>
+        <div class="pay-wrap panel-wrap" :class="{'lang':detailData.orderState === 7}">
+            <p class="type"><span class="fl">付款方式：</span>在线支付</p>
+             <p class="total"><span class="fl">商品总额：</span>{{detailData.totalAmount}}</p>
+            <template v-if="detailData.orderState === 7">
+              <p class="presaleAmount"><span class="fl">已付定金：</span>{{detailData.presaleAmount}}</p>
+              <p class="restAmount"><span class="fl">代付尾款金额：</span><span style="color:red">{{detailData.restAmount}}</span></p>
             </template>
             <template v-else>
-                <p class="pay">支付金额：<span v-if="detailData.orderState !== 0 && detailData.orderState !== 6">{{detailData.totalAmount}}</span><span v-else>未支付</span></p>
-                <p class="pay-time" v-if="detailData.payTimestamp !== 0">支付时间：{{detailData.payTimestamp | moments}}</p>
+                <p class="pay"><span class="fl">支付金额：</span><span v-if="detailData.orderState !== 0 && detailData.orderState !== 6">{{detailData.totalAmount}}</span><span v-else>未支付</span></p>
+                <p class="pay-time" v-if="detailData.payTimestamp !== 0"><span class="fl">支付时间：</span>{{detailData.payTimestamp | moments}}</p>
             </template>
         </div>
       </div>
-      <div class="fl invoice panel">
+      <div class="invoice panel">
         <p class="title"><i class="el-icon el-icon-tickets"></i>发票信息</p>
-        <div class="address-wrap panel-wrap">
-            <p class="invoiceType" v-if="detailData.invoiceType !==0">发票类型：{{detailData.invoiceType}}</p>
-            <p class="invoiceType" v-else>发票类型：不开发票</p>
-            <p class="phone" v-if="detailData.invoiceType !==0">发票抬头：{{detailData.title}}</p>
-            <p class="phone" v-if="detailData.invoiceType !==0">发票内容：商品明细</p>
-            <p class="address-info" v-if="detailData.invoiceType !== 0">纳税人税号：{{detailData.taxNumber}}</p>
+        <div class="invoice-wrap panel-wrap" :class="{'lang':detailData.invoiceType === 2}">
+            <p class="invoiceType"><span class="fl">发票类型：</span>{{detailData.invoiceType | toInvoiceText}}</p>
+            <template v-if="detailData.invoiceType === 2">
+              <div class="phone moreText" ><span class="fl">发票抬头：</span><p class="text">{{detailData.title}}</p></div>
+              <p class="phone" ><span class="fl">发票内容：</span>商品明细</p>
+              <p class="address-info"><span class="fl">纳税人税号：</span>{{detailData.taxNumber}}</p>
+            </template>
         </div>
       </div>
     </div>
@@ -93,6 +100,14 @@
             </el-table-column>
             <!-- 根据orderState属性来添加不同的按钮 -->
             <!-- 订单状态 ： 0-未支付 1-已支付 2-配送中 3-完成 4-退款中 5-已退款 6-已取消 7-待付尾款 -->
+            <!--
+              1、待付款（orderState=0）： 立即付款、取消订单；
+              2、待付尾款（orderState=7）：付尾款；
+              3、待发货（orderState=1）：售后入口；
+              4、待收货（orderState=2）：查看物流 售后入口；
+              5、已完成（orderState=3）：查看物流 售后入口；
+              6、已取消（orderState=6）：无；
+             -->
             <el-table-column
               label="操作"
               class-name="handle-cell"
@@ -101,16 +116,16 @@
                   <el-button type="primary" class="custom-bg" v-if="detailData.orderState === 0" @click="toPay(detailData.orderId)">立即付款</el-button>
                   <el-button type="primary" class="custom-bg" v-if="detailData.orderState === 7" @click="toPay(detailData.orderId)">付尾款</el-button>
                    <el-button plain v-if="detailData.orderState === 0" @click="cancelOrder(detailData.orderId)">取消订单</el-button>
-                  <span v-if="detailData.orderState === 6">已取消</span>
-                  <span v-if="detailData.orderState === 1">待发货</span>
-                  <el-button plain v-if="detailData.orderState === 2" @click="sureRecieve(detailData.orderId)">确认收货</el-button>
-                  <el-button plain v-if="detailData.orderState === 3" @click="toService(detailData.orderId)">申请售后</el-button>
-                  <el-button plain v-if="detailData.orderState === 4" @click="toServiceStatus(detailData.orderId)">查看售后</el-button>
-                  <el-button plain v-if="detailData.orderState === 2" @click="checkLogistics(detailData.orderId)">查看物流</el-button>
+                  <!-- <span v-if="detailData.orderState === 6">已取消</span> -->
+                  <!-- <span v-if="detailData.orderState === 1">售后</span> -->
+                  <!-- <el-button plain v-if="detailData.orderState === 2" @click="sureRecieve(detailData.orderId)">确认收货</el-button> -->
+                  <el-button plain v-if="detailData.orderState > 0 && detailData.orderState < 4" @click="toService(detailData.orderId, detailData.afterSaleApplyState)">售后</el-button>
+                  <!-- <el-button plain v-if="detailData.orderState === 4" @click="toServiceStatus(detailData.orderId)">查看售后</el-button> -->
+                  <el-button plain v-if="detailData.orderState === 2 || detailData.orderState === 3" @click="checkLogistics(detailData.orderId)">查看物流</el-button>
               </template>
             </el-table-column>
         </el-table>
-        <el-button plain class="custom-height fr"  @click="toOrderList"><svg-icon icon-class="fanhui" />返回订单列表</el-button>
+        <!-- <el-button plain class="custom-height fr"  @click="toOrderList"><svg-icon icon-class="fanhui" />返回订单列表</el-button> -->
         <!-- 物流查看 -->
     <el-dialog   custom-class="loginstics-dialog hasCancel" width="508px" :visible.sync="logisticsDialogVisible">
       <span slot="title"><i class="el-icon el-icon-view"></i>查看物流信息</span>
@@ -155,6 +170,20 @@ export default {
       }
     }
   },
+  filters: {
+    toInvoiceText(val) {
+      switch (val) {
+        case 0:
+          return '不开发票';
+        case 1:
+          return '个人';
+        case 2:
+          return '单位';
+        case 3:
+          return '增值税专票';
+      }
+    }
+  },
   methods: {
     getDetail() {
       this.$fetchPost({
@@ -189,9 +218,17 @@ export default {
         this.logisticsDialogVisible = true;
       });
     },
-    toService(id) {
+    toPay(id) {
+      this.$router.push({path: `/pay/${id}`});
+    },
+    toService(id, state) {
       const userId = this.$store.getters.userId;
-      this.$router.push({path: `/user/${userId}/service/${id}`});
+      console.log(state);
+      if (state === 0) {
+        this.$router.push({path: `/user/${userId}/service/${id}`});
+      } else {
+        this.$router.push({path: `/user/${userId}/service_status/${id}`});
+      }
     },
     toOrderList() {
       const userId = this.$store.getters.userId;
@@ -216,14 +253,14 @@ export default {
           this.getDetail();
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消删除'
+        // });
       });
     },
     sureRecieve(id) {
-      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+      this.$confirm('此操作将确认收货, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -237,10 +274,10 @@ export default {
           this.getDetail();
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消确认'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消确认'
+        // });
       });
     }
   },
@@ -315,10 +352,12 @@ export default {
   }
 }
 .info-wrap{
+  display: table;
   padding-top: 28px;
   padding-bottom: 46px;
   overflow: hidden;
   .panel{
+    display: table-cell;
     width: 256px;
     padding-left: 10px;
     .title{
@@ -333,9 +372,32 @@ export default {
     }
     .panel-wrap{
       padding-left: 23px;
-      p{
+      .fl{
+        width: 60px;
+      }
+      &.pay-wrap.lang{
+        .fl{
+          width: 84px;
+        }
+      }
+      &.invoice-wrap.lang{
+        .fl{
+          width: 72px;
+        }
+      }
+      & > p{
         font-size: 12px;
         line-height: 24px;
+      }
+      .moreText{
+        font-size: 12px;
+        line-height: 24px;
+        &.phone p{
+          padding-left: 70px;
+        }
+        &.address-info p{
+          padding-left: 60px;
+        }
       }
     }
   }
@@ -349,7 +411,10 @@ export default {
         #bg-img;
       }
       .name{
-        line-height: 92px;
+         display: table-cell;
+        line-height: 1.5;
+         height: 94px;
+        vertical-align: middle;
       }
 
   }
@@ -360,5 +425,8 @@ export default {
         margin: 5px 0 10px;
       }
   }
+}
+.el-breadcrumb__item{
+  margin-bottom: 35px;
 }
 </style>

@@ -30,11 +30,11 @@
     </el-form-item>
     <el-form-item class="protocol" prop="checkProtocol">
       <el-checkbox-group v-model="form.checkProtocol">
-      <el-checkbox class="has_checked"  name="type"></el-checkbox><span class="">我已看过并介绍《<a href="javascript:;" @click="showProtocol">用户协议</a>》</span>
+      <el-checkbox class="has_checked"  name="type"></el-checkbox><span class="">我已看过并接受《<a href="javascript:;" @click="showProtocol">用户协议</a>》</span>
       </el-checkbox-group>
     </el-form-item>
     <el-button class="signup custom-bg" type="primary" @click="onSubmit">立即注册</el-button>
-    <router-link class="signin fr" to="/signin">登录 <i class="el-icon-arrow-right"></i></router-link>
+    <router-link class="signin fr" to="/signin">切换为登录 <i class="el-icon-arrow-right"></i></router-link>
   </el-form>
 </div>
 </template>
@@ -141,8 +141,8 @@ export default {
             });
             // 将返回信息存到localstorage
             this.$tools.setItem('userInfo', res.data, true);
-            setTimeout(function() {
-              this.$router.push('/');
+            setTimeout(() => {
+              this.$router.push({path: '/'});
             }, 3000);
           });
         } else {

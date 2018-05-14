@@ -1,6 +1,6 @@
 <template>
 <div class="upload-wrap">
-  <input type="file" ref="uploadFile" @change="upload">
+  <input type="file" ref="uploadFile" accept="image/*" @change="upload">
   <el-progress  v-show="uploading" type="circle" :percentage="process" :width="width"></el-progress>
 </div>
 

@@ -1,7 +1,7 @@
 <template>
   <el-form :model="addressFormData" :rules="rules" ref="addressForm" label-width="92px" class="addressForm">
     <el-form-item label="收货人" prop="receiver">
-      <el-input v-model="addressFormData.receiver" style="width:120px;"></el-input>
+      <el-input v-model="addressFormData.receiver" maxlength="4" style="width:120px;"></el-input>
     </el-form-item>
     <el-form-item label="所在地区" required>
       <el-col :span="120">
@@ -42,7 +42,7 @@
         </el-col>
     </el-form-item>
     <el-form-item label="详细地址" prop="addressDetail">
-      <el-input v-model="addressFormData.addressDetail"></el-input>
+      <el-input v-model="addressFormData.addressDetail" maxlength="30"></el-input>
     </el-form-item>
     <el-form-item label="手机号码" prop="phone">
       <el-input type="tel" v-model="addressFormData.phone" style="width:220px;"></el-input>
@@ -135,7 +135,9 @@ export default {
   },
   data() {
     let validateMobile = (rule, value, callback) => {
-      if (!(/^1[34578]\d{9}$/.test(value)) && value) {
+      if (!value) {
+        callback(new Error('手机号不能为空'));
+      } else if (!(/^1[34578]\d{9}$/.test(value))) {
         callback(new Error('请输入真实的手机号'));
       } else {
         callback();
@@ -169,7 +171,7 @@ export default {
           { required: true, message: '请输入详细地址', trigger: 'blur' }
         ],
         phone: [
-          { validator: validateMobile, type: 'number', trigger: 'blur' }
+          { required: true, validator: validateMobile, type: 'number', trigger: 'blur' }
         ],
         zipCode: [
           { validator: validateZipCode, type: 'number', trigger: 'blur' }
@@ -236,7 +238,7 @@ export default {
         if (valid) {
           if (this.addEdit) {
             updateAddress(this.addressFormData).then(res => {
-              this.$emit('closeAddDialog');
+              this.$emit('closeAddDialog', {data: {addressId: this.addressFormData.addressId}});
               this.$refs[form].resetFields();
             });
           } else {

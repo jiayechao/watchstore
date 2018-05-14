@@ -1,6 +1,6 @@
 <template>
   <div class="main-wrap">
-    <div class="cart-wrap">
+    <div class="cart-wrap" v-if="cartGoods.length">
       <el-table
         empty-text="没有购买，快去购物吧~"
         :data="cartGoods"
@@ -52,7 +52,8 @@
           label=""
           align="center">
           <template slot-scope="scope">
-            <span class="delete" @click="deleteCart(scope.row.cartId)"><i class="el-icon-delete"></i></span>
+            <!-- <i class="el-icon-delete"></i> -->
+            <span class="delete" @click="deleteCart(scope.row.cartId)">删除</span>
           </template>
         </el-table-column>
       </el-table>
@@ -66,6 +67,11 @@
         </p>
       </div>
       </div>
+      <div class="no-goods" v-else>
+        <img src="../../assets/images/qq2.png" alt="">
+        <p>购物车是空的~</p>
+        <el-button class="custom-bg" type="primary" @click="toIndex">去购物</el-button>
+      </div>
   </div>
 </template>
 
@@ -78,10 +84,23 @@ export default {
       multipleSelection: []
     };
   },
-  created() {
+  beforeRouteEnter (to, from, next) {
+    getCart().then(res => {
+      next(vm => {
+        vm.cartGoods = res.data;
+      });
+    });
+  },
+  beforeRouteUpdate (to, from, next) {
     getCart().then(res => {
       this.cartGoods = res.data;
+      next();
     });
+  },
+  created() {
+    // getCart().then(res => {
+    //   this.cartGoods = res.data;
+    // });
   },
   computed: {
     payPrice() {
@@ -129,10 +148,10 @@ export default {
           });
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消删除'
+        // });
       });
     },
     changeNum(num, id) {
@@ -142,7 +161,14 @@ export default {
           cartId: id,
           num: num
         }
+      }).then(res => {
+        getCart().then(res => {
+          this.cartGoods = res.data;
+        });
       });
+    },
+    toIndex() {
+      this.$router.push({path: '/'});
     }
   }
 };
@@ -169,7 +195,10 @@ export default {
       #bg-img;
     }
     .name{
-      line-height: 104px;
+       display: table-cell;
+        line-height: 1.5;
+         height: 94px;
+        vertical-align: middle;
       padding-left: 28px;
     }
     .pay-wrap{
@@ -199,8 +228,28 @@ export default {
       padding-bottom: 14px;
     }
     .delete{
+      color: @base-color;
       cursor: pointer;
     }
+  }
+  .no-goods{
+      height: 510px;
+      padding: 18px 50px;
+      text-align: center;
+      background: #fff;
+      box-shadow: 0 0 10px  0 #ccc;
+      overflow: hidden;
+      img{
+        margin-top: 14%;
+      }
+      p{
+        font-size: 16px;
+        line-height: 42px;
+        margin-bottom: 10px;
+      }
+      .el-button{
+        width: 136px;
+      }
   }
 }
 </style>

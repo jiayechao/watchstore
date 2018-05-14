@@ -12,36 +12,27 @@
           <ul>
             <li>产品</li>
             <li>
-              <router-link to="/wristwatch">2G产品</router-link>
+              <router-link to="/s-series">S3</router-link>
             </li>
             <li>
-              <router-link to="/wristwatch">4G产品</router-link>
+              <router-link to="/x-series">X1</router-link>
             </li>
           </ul>
+          
           <ul>
             <li>品牌</li>
-            <li>
-              <router-link to="/wristwatch">关于我们</router-link>
-            </li>
-            <li>
-              <router-link to="/wristwatch">联系我们</router-link>
-            </li>
-            <li>
-              <router-link to="/wristwatch">加入我们</router-link>
-            </li>
+            <li><router-link to="/about">关于我们</router-link></li>
+            <li><router-link to="/contact">联系我们</router-link></li>
+            <!--<li><router-link to="/wristwatch">加入我们</router-link></li>-->
           </ul>
+          
           <ul>
             <li>服务</li>
-           <li>
-              <router-link to="/wristwatch">常见问题</router-link>
-            </li>
-            <li>
-              <router-link to="/wristwatch">售后服务</router-link>
-            </li>
-            <li>
-              <router-link to="/wristwatch">销售网络</router-link>
-            </li>
+            <li><router-link to="/commonProblem">常见问题</router-link></li>
+            <li><router-link to="/afterService">售后服务</router-link></li>
+            <li><router-link to="/salesNetwork">销售网络</router-link></li>
           </ul>
+          
           <ul>
             <li>关注我们</li>
             <li>
@@ -55,11 +46,13 @@
               </div>
             </li>
           </ul>
+          
           <div class="fr">
            <p class="phone">400-705-8885</p>
            <p class="time">周一至周日：09:00 ~ 21:00</p>
           </div>
         </div>
+        
         <p class="copyright">Copyright © Artimen Technologies inc. All rights reserved 沪ICP备15001612号</p>
       </div>
   </footer>
@@ -74,7 +67,7 @@ export default {
 <style lang="less" scoped>
 .footer{
   position: relative;
-  background: #fafafa;
+  background: #fff;
   .footer-wrap{
       width: 1103px;
       margin: 0 auto;

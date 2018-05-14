@@ -1,5 +1,5 @@
 <template>
-  <div class="order_list-wrap">
+  <div v-if="orderList.length" class="order_list-wrap">
     <p class="table-list-title">
       <span class="order-detail fl">订单详情</span>
       <span class="sum-price fl">金额</span>
@@ -59,15 +59,13 @@
                   </template>
                 </el-table-column>
                 <!-- 根据orderState属性来添加不同的按钮 -->
-                <!-- 订单状态 ： 0-代付款 1-待发货 2-待收货 3-已完成 4-申请售后 5-已退款 6-已取消 7-待付尾款 -->
                 <!--
-                  1、待付款：取消订单、立即付款、查看详情；
-                  2、待付尾款：付尾款、查看详情；
-                  3、待发货：查看详情；
-                  4、待收货：查看物流、确认收货、查看详情；
-                  5、已完成：申请售后、查看详情；
-                  6、已取消：查看详情；
-                  7、申请售后：查看详情；
+                  1、待付款（orderState=0）： 立即付款、取消订单、查看订单；
+                  2、待付尾款（orderState=7）：付尾款、查看订单；
+                  3、待发货（orderState=1）：查看订单；
+                  4、待收货（orderState=2）：查看物流、查看订单；
+                  5、已完成（orderState=3）：查看订单；
+                  6、已取消（orderState=6）：查看订单；
                  -->
                 <el-table-column
                   label="操作"
@@ -83,13 +81,13 @@
                       <!-- 所有可查看订单 -->
                       <el-button plain @click="toDetail(scope.row.orderId)">查看详情</el-button>
                       <!-- 配送中可以确认收货 -->
-                       <el-button plain v-if="scope.row.orderState === 2" @click="sureRecieve(scope.row.orderId)">确认收货</el-button>
+                       <!-- <el-button plain v-if="scope.row.orderState === 2" @click="sureRecieve(scope.row.orderId)">确认收货</el-button> -->
                         <!-- 已支付和配送中可以申请售后 -->
-                      <el-button plain v-if="scope.row.orderState === 3" @click="toService(scope.row.orderId)">申请售后</el-button>
+                      <!-- <el-button plain v-if="scope.row.orderState === 3" @click="toService(scope.row.orderId)">申请售后</el-button> -->
                       <!-- 有申请售后可查看 -->
-                      <el-button plain v-if="scope.row.aftersalesState" @click="toServiceStatus(scope.row.orderId)">查看售后</el-button>
+                      <!-- <el-button plain v-if="scope.row.aftersalesState" @click="toServiceStatus(scope.row.orderId)">查看售后</el-button> -->
                       <!-- 已支付到完成可查看物流  " -->
-                      <el-button plain v-if="scope.row.orderState ===2"  @click="checkLogistics(scope.row.orderId)">查看物流</el-button>
+                      <el-button plain v-if="scope.row.orderState === 2 || scope.row.orderState === 3"  @click="checkLogistics(scope.row.orderId)">查看物流</el-button>
                   </template>
                 </el-table-column>
             </el-table>
@@ -97,6 +95,8 @@
       <div class="pagination">
        <el-pagination
         layout="prev, pager, next"
+        prev-text="上一页"
+        next-text="下一页"
         :page-size="5"
         :current-page="page"
         @current-change="currentChange"
@@ -112,8 +112,15 @@
     </div>
     </el-dialog>
   </div>
+  <div v-else class="no-order_list">
+    <img src="../../../../assets/images/qq1.png" alt="">
+    <p>暂无订单</p>
+    <el-button class="custom-bg" type="primary" @click="toIndex">去购物</el-button>
+  </div>
 </template>
 <script>
+import path from '@/api/api-path';
+import { fetchPost } from '@/utils/fetch';
 import logistics from '@/components/logistics';
 export default {
   data() {
@@ -125,10 +132,46 @@ export default {
       logisticsDialogVisible: false
     };
   },
+  beforeRouteEnter (to, from, next) {
+    fetchPost({
+      url: path.GET_ORDER_LIST,
+      data: {
+        page: 1,
+        pageSize: 5
+      }
+    }).then(res => {
+      next(vm => {
+        vm.orderList = res.data.orderList;
+        vm.hasNext = res.data.hasNext;
+        vm.totalSize = res.data.totalSize;
+      });
+    });
+  },
+  beforeRouteUpdate (to, from, next) {
+    fetchPost({
+      url: path.GET_ORDER_LIST,
+      data: {
+        page: 1,
+        pageSize: 5
+      }
+    }).then(res => {
+      this.orderList = res.data.orderList;
+      this.hasNext = res.data.hasNext;
+      this.totalSize = res.data.totalSize;
+      next();
+    });
+  },
   created() {
-    this.getList();
+    // this.getList();
   },
   filters: {
+    /*
+    1、待付款（orderState=0）： 立即付款、取消订单、查看订单；
+2、待付尾款（orderState=7）：付尾款、查看订单；
+3、待发货（orderState=1）：查看订单；
+4、待收货（orderState=2）：查看物流、查看订单；
+5、已完成（orderState=3）：查看订单；
+6、已取消（orderState=6）：查看订单； */
     toStatusText(val) {
       switch (val) {
         case 0:
@@ -140,9 +183,11 @@ export default {
         case 3:
           return '已完成';
         case 4:
-          return '申请售后';
+          return '已完成';
+          // return '申请售后';
         case 5:
-          return '已退款';
+          return '已完成';
+          // return '已退款';
         case 6:
           return '已取消';
         case 7:
@@ -189,10 +234,10 @@ export default {
           this.getList();
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消删除'
+        // });
       });
     },
     toDetail(id) {
@@ -200,7 +245,7 @@ export default {
       this.$router.push({path: `/user/${userId}/order/${id}`});
     },
     sureRecieve(id) {
-      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+      this.$confirm('此操作确认收货, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -214,10 +259,10 @@ export default {
           this.getList();
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消确认'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消确认'
+        // });
       });
     },
     checkLogistics(id) {
@@ -238,6 +283,9 @@ export default {
     toServiceStatus(id) {
       const userId = this.$store.getters.userId;
       this.$router.push({path: `/user/${userId}/service_status/${id}`});
+    },
+    toIndex() {
+      this.$router.push({path: '/'});
     }
   },
   components: {
@@ -322,7 +370,7 @@ export default {
       .name{
         padding-top: 20px;
         padding-bottom: 20px;
-        line-height: 1;
+        line-height: 1.5;
       }
       .style-wrap{
         color: #888;
@@ -347,6 +395,16 @@ export default {
         margin-right: 15px;
       }
     }
+  }
+}
+.no-order_list{
+  text-align: center;
+  img{
+    margin-top: 14%;
+  }
+  p{
+    font-size: 16px;
+    line-height: 42px;
   }
 }
 </style>

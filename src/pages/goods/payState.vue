@@ -2,13 +2,15 @@
 <div class="main-wrap">
   <div class="content">
     <div class="statusImg">
-        <img v-if="payStatus === 1 || payStatus === 3" src="../../assets/images/cg.png">
-        <img v-if="payStatus === 2" src="../../assets/images/failed.png">
+        <img v-if="payStatus === 1 || payStatus === 3" src="../../assets/images/pay-success.png">
+        <img v-if="payStatus === 2" src="../../assets/images/pay-fail.png">
     </div>
     <p class="statusText">{{msgDesc}}</p>
     <div class="link-wrap">
-      <router-link class="fl toGoods" to="/"><i class="el-icon el-icon-d-arrow-left"></i>继续购物</router-link>
-      <router-link class="fl toOrderDetail" :to="orderUrl">查看订单</router-link>
+      <el-button plain class="custom-height toOrderDetail" type="default" @click="toOrderDetail">查看订单</el-button>
+      <el-button  class="custom-bg custom-height toGoods" type="primary" @click="toBuy">继续购物</el-button>
+      <!-- <router-link class="fl toOrderDetail" :to="orderUrl">查看订单</router-link>
+      <router-link class="fl toGoods" to="/"></router-link> -->
     </div>
   </div>
 </div>
@@ -42,6 +44,20 @@ export default {
       const orderId = this.$route.query.queryOrderId || this.$route.query.orderId || '';
       return orderId ? '/user/' + this.$store.getters.userId + '/order/' + orderId : '/';
     }
+  },
+  methods: {
+    toOrderDetail() {
+      const orderId = this.$route.query.queryOrderId || this.$route.query.orderId || '';
+      const userId = this.$store.getters.userId;
+      if (orderId) {
+        this.$router.push({path: `/user/${userId}/order/${orderId}`});
+      } else {
+        this.$route.push({path: '/'});
+      }
+    },
+    toBuy() {
+      this.$router.push({path: '/'});
+    }
   }
 };
 </script>
@@ -65,7 +81,7 @@ export default {
       display: block;
       text-align: center;
       height: 60px;
-      margin: 0 auto 12px;
+      margin: 94px auto 12px;
       p{
         font-size: 16px;
         font-weight: bold;
@@ -73,23 +89,16 @@ export default {
       }
     }
     .statusText{
-      font-size: 16px;
+      font-size: 26px;
       line-height: 40px;
       text-align: center;
-      font-weight: bold
     }
     .link-wrap{
-      width: 190px;
+     text-align: center;
       margin: 68px auto 0;
       line-height: 1;
-      .toGoods{
-        float: left;
-        color: #888;
-      }
       .toOrderDetail{
-         float: right;
          color: @font-color;
-         text-decoration: underline;
       }
     }
  }

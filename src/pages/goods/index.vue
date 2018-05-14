@@ -1,12 +1,11 @@
 <template>
   <div class="detail-wrap">
-    <div class="detail">
+    <div class="detail" v-if="itemDetail.styleList">
       <div class="detail-imgs fl">
         <div v-if="itemDetail.styleList"
-          class="big-img"
-          :style="{backgroundImage:'url('+currentColorImgUrl+')'}"></div>
+          class="big-img" :style="{backgroundImage:'url('+currentColorImgUrl+')'}"></div>
         <div style="overflow:hidden;">
-          <span class="to-left fl" @click="toLeft"><i class="el-icon-arrow-left"></i></span>
+          <span class="to-left fl" @click="toRight"><i class="el-icon-arrow-left"></i></span>
           <div class="small-img-wrap fl">
             <div v-if="itemDetail.styleList"
               class="small-img"
@@ -19,13 +18,24 @@
               @click="styleNum = index"></span>
             </div>
           </div>
-          <span class="to-right fl" @click="toRight"><i class="el-icon-arrow-right"></i></span>
+          <span class="to-right fl" @click="toLeft"><i class="el-icon-arrow-right"></i></span>
         </div>
       </div>
       <div class="detail-info">
         <p class="title">{{itemDetail.itemName}}</p>
         <p class="desc">{{itemDetail.itemDescr}}</p>
-        <p class="price" v-if="itemDetail.styleList">￥{{totalPrice}}</p>
+        <div v-if="itemDetail.isPresale === 1 && itemDetail.styleList" class="presale-price">
+            <p class="finishTime">距抢购结束：
+                <template v-if="presaleEndTimestamp < nowTime">
+                  <span class="fr">抢购已结束</span>
+                </template>
+                <template v-else>
+                  <span class="fr"><svg-icon icon-class="shalou"></svg-icon>{{finishTime}}</span>
+                </template>
+              </p>
+              <p>￥{{totalPrice}}<span style="font-size:14px">元</span></p>
+        </div>
+        <p v-else-if="itemDetail.isPresale === 0 && itemDetail.styleList" class="price" >￥{{totalPrice}}<span style="font-size:14px">元</span></p>
         <div class="style-color">
           <span class="label">颜色</span>
           <div class="color-wrap" v-if="itemDetail.styleList">
@@ -43,25 +53,34 @@
           <span class="label">数量</span>
           <!-- 分抢购和普通 -->
           <template v-if="itemDetail.isPresale === 1">
-                <el-input-number  v-model="count"  :min="1" :max="2" size="mini"></el-input-number>
+                <el-input-number v-model="count" :key="currentStyle" :disabled="itemDetail.styleList[currentStyle].stock === 0"  :min="Math.min(1,itemDetail.styleList[currentStyle].stock)" :max="2" size="mini"></el-input-number>
                 <span style="font-size:12px; color:#888">（每个ID限购2个）</span>
           </template>
-
-          <el-input-number v-else v-model="count"  :min="1" :max="itemDetail.stock || Infinity" size="mini"></el-input-number>
+          <!-- 切换样式时加个kye可以解决库存不一致的bug -->
+          <el-input-number v-else v-model="count" :key="currentStyle" :disabled="itemDetail.styleList[currentStyle].stock === 0" :min="Math.min(1,itemDetail.styleList[currentStyle].stock)" :max="itemDetail.styleList[currentStyle].stock || Infinity" size="mini"></el-input-number>
         </div>
         <div class="btn-wrap">
           <template v-if="itemDetail.isPresale === 0">
-            <el-button class="custom-bg" type="primary" @click="buyNow" :disabled="itemDetail.saleState === 0">立即购买</el-button>
-            <el-button plain class="addCart"  @click="addCart" :disabled="itemDetail.saleState === 0">加入购物车</el-button>
+            <el-button class="custom-bg" type="primary" @click="buyNow" :disabled="itemDetail.saleState === 0 || itemDetail.styleList[currentStyle].stock < 1">立即购买</el-button>
+            <el-button plain class="addCart"  @click="addCart" :disabled="itemDetail.saleState === 0 || itemDetail.styleList[currentStyle].stock < 1">加入购物车</el-button>
           </template>
            <template v-else-if="itemDetail.isPresale === 1">
-             <el-button class="custom-bg presale" type="primary" @click="presalesGoods" :disabled="itemDetail.saleState === 0"><span style="font-size:26px">￥{{itemDetail.presalePrice}} </span> 抢预售名额</el-button>
-              <p class="finishTime">距抢购结束：<svg-icon icon-class="shalou"></svg-icon>{{finishTime}}</p>
+             <!-- 不售卖或者已过预售时间或者库存为0 -->
+             <el-button class="custom-bg presale" type="primary" @click="presalesGoods" :disabled="itemDetail.saleState === 0 || itemDetail.styleList[currentStyle].stock < 1 || presaleEndTimestamp < nowTime"><span style="font-size:26px">￥{{itemDetail.presalePrice}} </span> 抢预售名额</el-button>
+              <!-- <p class="finishTime">距抢购结束：
+                <template v-if="presaleEndTimestamp < nowTime">
+                  <span>抢购已结束</span>
+                </template>
+                <template v-else>
+                  <svg-icon icon-class="shalou"></svg-icon>{{finishTime}}
+                </template>
+              </p> -->
            </template>
         </div>
       </div>
     </div>
-    <div class="paramsImg" v-for="(item, index) in paramsImgs" :key="index" :style="{backgroundImage:'url('+item+')'}"></div>
+    <img class="paramsImg" v-for="(item, index) in paramsImgs" :key="index" :src="item">
+    <!-- <div class="paramsImg" v-for="(item, index) in paramsImgs" :key="index" :style="{backgroundImage:'url('+item+')'}"></div> -->
   </div>
 </template>
 
@@ -79,7 +98,8 @@ export default {
       styleNum: 0, // 当前展示的小图index
       distance: 0, // 滑动的距离
       nowTime: '', // 当前时间戳
-      presaleEndTimestamp: '' // 抢购时结束时间戳
+      presaleEndTimestamp: '', // 抢购时结束时间戳
+      time: '' // 定时器
     };
   },
   beforeRouteEnter (to, from, next) {
@@ -94,6 +114,7 @@ export default {
         vm.nowTime = res.times;
         vm.presaleEndTimestamp = res.data.presaleEndTimestamp;
         vm.paramsImgs = res.data.detailImgUrls.concat(res.data.paramsImgUrls);
+        vm.countDown();
       });
     });
   },
@@ -108,6 +129,7 @@ export default {
       this.nowTime = res.times;
       this.presaleEndTimestamp = res.data.presaleEndTimestamp;
       this.paramsImgs = res.data.detailImgUrls.concat(res.data.paramsImgUrls);
+      this.countDown();
       next();
     });
   },
@@ -123,6 +145,9 @@ export default {
     //   this.presaleEndTimestamp = res.data.presaleEndTimestamp;
     //   this.paramsImgs = res.data.detailImgUrls.concat(res.data.paramsImgUrls);
     // });
+  },
+  beforeDestroy () {
+    clearInterval(this.time);
   },
   computed: {
     finishTime() {
@@ -142,7 +167,7 @@ export default {
         hour %= 24;// 算出有多分钟
       }
       // day + '天' + hour + '小时' + minute + '分' + second + '秒';
-      return day + '天' + hour + '小时' + minute + '分';
+      return day + '天' + hour + '小时' + minute + '分' + parseInt(second) + '秒';
     },
     // 当前展示的大图
     currentColorImgUrl() {
@@ -241,16 +266,30 @@ export default {
       });
     },
     toLeft() {
-      const len = (this.currentStyleImgUrls.length - 1) * 102;
-      if (Math.abs(this.distance) < len) {
+      // 向左滑动的条件就是总length长度 - distance > 408(包裹div的长度) 的值
+      // const len = (this.currentStyleImgUrls.length - 1) * 102;
+      // if (Math.abs(this.distance) < len && this.currentStyleImgUrls.length > 4) {
+      //   this.distance = this.distance - 408;
+      // }
+      const len = this.currentStyleImgUrls.length * 102;
+      if (len - Math.abs(this.distance) > 408) {
         this.distance = this.distance - 408;
       }
     },
     toRight() {
-      const len = (this.currentStyleImgUrls.length - 1) * 102;
-      if (Math.abs(this.distance) >= len) {
+      // 向右滑动的条件就是 distance的距离为负值
+      // const len = (this.currentStyleImgUrls.length - 1) * 102;
+      // if (Math.abs(this.distance) >= len) {
+      //   this.distance = this.distance + 408;
+      // }
+      if (this.distance < 0) {
         this.distance = this.distance + 408;
       }
+    },
+    countDown() {
+      this.time = setInterval(() => {
+        this.nowTime += 1000;
+      }, 1000);
     }
   }
 };
@@ -267,10 +306,13 @@ export default {
     overflow: hidden;
   }
   .paramsImg{
-    max-width: 1400px;
-    height: 746px;
+    // max-width: 1400px;
+    // height: 746px;
+    // margin: 0 auto;
+    // #bg-img;
+    display: block;
+    width: 1200px;
     margin: 0 auto;
-    #bg-img;
   }
 }
 .detail-imgs{
@@ -315,6 +357,22 @@ export default {
 }
 .detail-info{
   padding-left: 660px;
+  .presale-price{
+    margin-bottom: 30px;
+    p{
+      font-size: 26px;
+      color: red;
+      padding: 0 22px;
+      line-height: 64px;
+      background: #f8f8f8;
+    }
+    .finishTime{
+      font-size: 16px;
+      line-height: 38px;
+      color: #fff;
+      background: #ff8080;
+    }
+  }
   .title{
     font-size: 36px;
     line-height: 64px;
@@ -350,6 +408,7 @@ export default {
       float: left;
       border: 1px solid #e6e6e6;
       margin-right: 24px;
+      margin-bottom: 10px;
       box-sizing: border-box;
       cursor: pointer;
       &.active{
@@ -365,7 +424,8 @@ export default {
     }
     .color-name{
       display: inline-block;
-      width: 67px;
+      min-width: 67px;
+      padding: 0 10px;
       height: 28px;
       line-height: 28px;
       border-left: 1px solid #e6e6e6;

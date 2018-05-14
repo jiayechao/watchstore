@@ -41,14 +41,14 @@
           <span slot="label"><svg-icon icon-class="cascades" />服务类型:</span>
           <el-radio-group v-model="serviceForm.serviceType">
             <el-radio :label="1" border size="mini">退款</el-radio>
-            <el-radio :label="2" border size="mini">退货</el-radio>
+            <el-radio v-if="detailData.orderState >1 && detailData.orderState <7" :label="2" border size="mini">退货</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="退款金额:" prop="refundAmount">
-          <el-input style="width:128px;" v-model.number="serviceForm.refundAmount" size="mini"></el-input> 元
+          <el-input style="width:128px;" v-model.number="serviceForm.refundAmount" size="mini"></el-input> 元<span style="color:#999">（退货金额不超过商品总价）</span>
         </el-form-item>
         <el-form-item label="提交数量:" prop="num">
-          <el-input-number v-model="serviceForm.num"  :min="1" :max="maxNum" size="mini"></el-input-number>
+          <el-input-number v-model="serviceForm.num"  :min="1" :max="maxNum" size="mini"></el-input-number><span style="color:#999">（您最多可提交数量为{{maxNum}}个）</span>
         </el-form-item>
         <el-form-item label="问题描述:" prop="descr">
           <el-input :rows="5" type="textarea" v-model="serviceForm.descr"></el-input>
@@ -56,13 +56,13 @@
         </el-form-item>
         <el-form-item>
           <span slot="label"><i class="el-icon el-icon-picture-outline"  />图片信息</span>
-          <div class="load-wrap"><el-uploadImg @uplaodSucess="uplaodSucess" @uploadFailed="uploadFailed" :width="30"></el-uploadImg></div>
-           <div class="img-wrap">
+          <div class="img-wrap">
              <div class="img-item fl" v-for="(item, index) in imgKeysArr" :key="index"   :style="{backgroundImage: 'url(' +item+ ')'}">
-               <i class="el-icon-delete" @click="deleteImg(index)"></i>
+               <i class="el-icon-error" @click="deleteImg(index)"></i>
              </div>
+             <div class="load-wrap fl"><el-uploadImg @uplaodSucess="uplaodSucess" @uploadFailed="uploadFailed" :width="72"></el-uploadImg></div>
            </div>
-          <p class="img-note">为了帮助您更好的解决问题，请上传图片</p>
+          <p class="img-note" style="clear:both;">为了帮助您更好的解决问题，请上传图片</p>
           <p class="img-note">最多可上传5张图片,每张图片大小不超过5M，支持bmp,gif,jpg,png,jpeg格式文件</p>
         </el-form-item>
         <el-button class="custom-bg custom-height" type="primary" @click="applyAfterSales('serviceForm')">提交</el-button>
@@ -75,7 +75,9 @@ export default {
   data() {
     let validateRefundAmount = (rule, value, callback) => {
       console.log(this.maxAmount);
-      if (this.maxAmount < value && value) {
+      if (!value) {
+        callback(new Error('退款金额不能为空'));
+      } else if (this.maxAmount < value) {
         callback(new Error('退款金额不超过商品总价'));
       } else if (typeof value !== 'number' && value) {
         callback(new Error('退款金额必须是数字'));
@@ -119,9 +121,37 @@ export default {
       this.detailData = res.data;
       this.serviceForm.orderId = res.data.orderId;
       res.data.itemList.forEach(item => {
-        this.maxNum += item.num;
-        this.maxAmount += item.subtotal;
+        // this.maxNum += item.num;
+        // this.maxAmount += item.subtotal;
+        if (res.data.afterSaleApplyState === 88) {
+          this.$fetchPost({
+            url: this.$api.GET__PRE_AFTER_APPLY_INFO,
+            data: {
+              orderId: this.$route.params.orderId
+            }
+          }).then(res => {
+            console.log(res);
+            this.serviceForm.serviceType = res.data.serviceType;
+            this.serviceForm.refundAmount = res.data.refundAmount;
+            this.serviceForm.num = res.data.num;
+            this.serviceForm.descr = res.data.descr;
+            this.imgKeysArr = res.data.imgUrlList;
+          });
+        } else if (res.data.afterSaleApplyState === 1 || res.data.afterSaleApplyState === 2) {
+          const userId = this.$store.getters.userId;
+          const orderId = this.serviceForm.orderId;
+          this.$router.replace({path: `/user/${userId}/service_status/${orderId}`});
+        }
       });
+    });
+    this.$fetchPost({
+      url: this.$api.GET_AFTER_SALES_INFO,
+      data: {
+        orderId: this.$route.params.orderId
+      }
+    }).then(res => {
+      this.maxNum = res.data.maxRefundNum;
+      this.maxAmount = res.data.maxRefundAmount;
     });
   },
   methods: {
@@ -186,7 +216,10 @@ export default {
         #bg-img;
       }
       .name{
-        line-height: 92px;
+        display: table-cell;
+         height: 92px;
+        line-height: 1.5;
+        vertical-align: middle;
       }
   }
 }
@@ -215,40 +248,45 @@ export default {
 }
 .load-wrap{
   position: relative;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
+  width: 72px;
+  height: 72px;
+  line-height: 1;
   text-align: center;
   border: 1px solid #c0c0c0;
-  top: 4px;
   &:after{
     position: absolute;
+    width: 72px;
+    line-height: 72px;
     content: '+';
-    font-size: 24px;
+    font-size: 30px;
     color: #c0c0c0;
-    top: -1px;
-    left: 7px;
+    top: -3px;
+    left: 0px;
   }
 }
 .img-wrap{
-  overflow: hidden;
+  // overflow: hidden;
+  input{
+    top: -25px;
+  }
   .img-item{
     position: relative;
-    width: 100px;
-    height: 100px;
-    margin-right: 10px;
-    margin-top: 15px;
+    width: 72px;
+    height: 72px;
+    margin-right: 15px;
+    margin-bottom: 15px;
     border: 1px solid #eaeaea;
     #bg-img;
-    .el-icon-delete{
+    .el-icon-error{
       display: none;
       position: absolute;
-      top: 2px;
-      right: 4px;
+      color: red;
+      top: -8px;
+      right: -8px;
       cursor: pointer;
     }
     &:hover{
-       .el-icon-delete{
+       .el-icon-error{
          display: block;
        }
     }

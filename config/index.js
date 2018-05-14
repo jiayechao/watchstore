@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/wristwatch': {
-        target: 'http://wx.canplay.com.cn',
+        target: 'http://watch.canplay.com.cn',
         changeOrigin: true, //跨域
         // pathRewrite: {
         //   '^/wat': '/'

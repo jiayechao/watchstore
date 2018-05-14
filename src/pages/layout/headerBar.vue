@@ -3,15 +3,19 @@
     <div class="header-wrap">
         <div class="logo fl"></div>
         <ul class="nav">
-            <li><router-link to="/">首页</router-link></li>
-            <li><router-link to="/">S系列</router-link></li>
-            <li><router-link to="/">X系列</router-link></li>
-            <li><router-link to="/">品牌</router-link></li>
-            <li class="active"><router-link to="/">商城</router-link></li>
+            <li :class="{'active': activeClass === '/home'}"><router-link to="/home">首页</router-link></li>
+            <li :class="{'active': activeClass === '/s-series'}"><router-link to="/s-series">S3系列</router-link></li>
+            <li :class="{'active': activeClass === '/x-series'}"><router-link to="/x-series">X1系列</router-link></li>
+            <li :class="{'active': activeClass === '/brand'}"><router-link to="/brand">品牌</router-link></li>
+            <li :class="{'active': activeClass === '/shop'}"><router-link to="/shop">商城</router-link></li>
         </ul>
+
         <div class="info fr">
             <!-- 这里需要判定token来做是否登陆及购物车 -->
-            <a class="cart" href="javascript:;" v-popover:popover4> <svg-icon class="svg-icon" icon-class="cart" />购物车</a>
+            <a class="cart" href="javascript:;" v-popover:popover4>
+              <el-badge :hidden="!cartGoods.length" :value="cartGoods.length" :max="9" class="item">
+                <svg-icon class="svg-icon" icon-class="cart" />
+              </el-badge>购物车</a>
             <router-link class="signin" v-if="!userId"  to="/signin"> <svg-icon class="svg-icon" icon-class="my" />登录</router-link>
              <el-dropdown class="user-list" v-else>
                <a class="el-dropdown-link signin" href="javascript:;"> <img class="img-icon" :src="headerImg" alt="个人头像">{{username}}</a>
@@ -59,9 +63,17 @@ export default {
   name: 'Header',
   data() {
     return {
-      cartGoods: []
+      cartGoods: [],
+      activeClass: '/home'
     };
   },
+
+  watch: {
+    '$route'() {
+      this.activeClass = this.$route.path;
+    }
+  },
+
   computed: {
     headerImg() {
       return this.$store.getters.headImgUrl ? this.$store.getters.headImgUrl : '../../../../assets/images/shangchuantouxiang.png';
@@ -99,10 +111,10 @@ export default {
           });
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消删除'
+        // });
       });
     },
     toCart() {
@@ -117,6 +129,7 @@ export default {
     },
     signout() {
       this.$store.dispatch('LogOut').then(res => {
+        this.cartGoods = [];
         this.$router.push({path: '/'});
       });
     }
@@ -127,7 +140,7 @@ export default {
 <style lang="less" scoped>
 @import "../../assets/css/base.less";
   header{
-    background: #f8f8f8;
+    background: #fff;
     border-bottom: 1px solid #dcdcdc;
     .header-wrap{
         width: 1200px;
@@ -205,12 +218,12 @@ export default {
  .good-item{
     position: relative;
     padding: 0 24px;
-    height: 118px;
     border-bottom: 1px solid #dcdcdc;
+    overflow: hidden;
     .good-img{
         float: left;
         width: 70px;
-        height: 100%;
+        height: 118px;
         #bg-img;
     }
     .good-info{
@@ -218,9 +231,11 @@ export default {
     }
     .title{
       font-size: 16px;
-      line-height: 32px;
+      line-height: 24px;
       color: @font-color;
       padding-top: 24px;
+      padding-right: 20px;
+      margin-bottom: 12px;
     }
     .detail{
       font-size: 12px;
@@ -264,6 +279,14 @@ export default {
   }
   a{
     color: #666;
+  }
+}
+.el-dropdown-menu__item{
+  padding: 0;
+  text-align: center;
+  a{
+    display: block;
+    padding: 0 20px;
   }
 }
 </style>

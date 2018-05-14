@@ -1,58 +1,68 @@
 <template>
   <div class="main-wrap">
     <div class="panel address-list">
-      <p class="title"><i class="el-icon el-icon-location-outline"></i>收货人地址</p>
-      <div class="address-wrap">
-        <div class="address fl" :class="{active: item.addressId === orderForm.addressId  }" v-for="(item, index) in addressList" :key="index" @click="chooseAdd(item.addressId)">
-          <i class="el-icon el-icon-location-outline"></i>
-          <p class="name">{{item.receiver}}</p>
-          <p class="phone">{{item.phone}}</p>
-          <p class="detail">{{item.provinceName}}{{item.cityName}}{{item.areaName}}{{item.addressDetail}}</p>
+      <p class="title">收货人信息</p>
+      <div class="address-wrap" :style="{height: addressWrap[wrapindex].height}">
+        <div v-if="addressList.length" class="address fl" :class="{active: item.addressId === orderForm.addressId  }" v-for="(item, index) in addressList" :key="index" @click="chooseAdd(item.addressId)">
+          <p class="name">{{item.provinceName}}<span v-if="item.provinceName !== item.cityName">{{item.cityName}}</span><span>（{{item.receiver}} 收）</span></p>
+          <p class="phone">{{item.areaName}}{{item.addressDetail}} <span>{{item.phone}}</span></p>
+          <span class="isDefault" v-if="item.isDefault">默认地址</span>
+          <!-- <el-checkbox @change="changeDefault({addressId: item.addressId})" v-model="item.isDefault" :true-label = "1" :false-label="0" class="has_checked"  name="type">默认地址</el-checkbox> -->
           <div class="handle">
-            <el-checkbox @change="changeDefault({addressId: item.addressId})" v-model="item.isDefault" :true-label = "1" :false-label="0" class="has_checked"  name="type">默认地址</el-checkbox>
-             <a href="javascript:;" class="delete fr" @click.stop="deleteAddress({addressId: item.addressId})"><i class="el-icon el-icon-delete"></i>删除</a>
-            <a href="javascript:;" class="edit fr" @click.stop="editAddress(item)"><i class="el-icon el-icon-edit-outline"></i>编辑</a>
+             <!-- <a href="javascript:;" class="delete fr" @click.stop="deleteAddress({addressId: item.addressId})"><i class="el-icon el-icon-delete"></i>删除</a> -->
+             <!-- <i class="el-icon el-icon-edit-outline"> </i>-->
+            <a href="javascript:;" class="edit" @click.stop="editAddress(item)">修改</a>
           </div>
         </div>
-         <div class="address fl" @click="openAddDialog">
+         <div v-else class="address no-address fl" @click="openAddDialog">
            添加新地址
          </div>
       </div>
+      <p class="note">
+        <span v-if="addressList.length > 3 && wrapindex === 0" class="fl" @click="visibleAllAddress">{{addressWrap[wrapindex].text}}</span>
+        <el-button v-if="addressList.length <  4 || wrapindex === 1" class="custom-bg custom-height" type="primary"  @click="openAddDialog">添加收货地址</el-button>
+        <router-link class="fr" :to="'/user/'+$store.getters.userId+'/address'">管理收货地址</router-link>
+        </p>
     </div>
-    <div class="panel delivery-type"><span class="title"><svg-icon class="svg-icon" icon-class="yunshupeisong" />配送方式：</span><span class="text"><svg-icon class="svg-icon" icon-class="tianmaoshunfengbaoyou" />顺丰速运</span></div>
-    <div class="panel pay-type"><span class="title"><svg-icon class="svg-icon" icon-class="refund" />网上支付：</span><span class="text"><img class="img-icon" src="../../assets/images/wxPay-mini.png">微信支付</span><span class="text"><img class="img-icon" src="../../assets/images/aliPay-mini.png">支付宝</span></div>
-    <div class="panel invoice-list">
-      <div>
-        <span class="title"><i class="el-icon el-icon-tickets"></i>发票：</span>
-        <el-radio-group v-model="invoiceTag">
-          <el-radio :label="0">不开发票</el-radio>
-          <el-radio :label="3">普通发票<span>（统一默认开具电子发票）</span></el-radio>
-          <el-radio :label="4">增值税专用发票</el-radio>
-        </el-radio-group>
-      </div>
-      <div class="invoice-title" v-if="invoiceTag === 3">
-          <span>发票抬头：</span>
-          <el-radio-group v-model="orderForm.invoiceType">
-            <el-radio :label="1">个人</el-radio>
-            <el-radio :label="2">公司</el-radio>
+    <div class="panel order-info">
+      <p class="title">订单信息</p>
+      <!-- <svg-icon class="svg-icon" icon-class="yunshupeisong" /><svg-icon class="svg-icon" icon-class="refund" /> i class="el-icon el-icon-tickets"></i>-->
+      <div class="delivery-type"><span class="title">配送方式：</span><span class="text"><svg-icon class="svg-icon" icon-class="tianmaoshunfengbaoyou" />顺丰速运</span></div>
+      <div class="pay-type"><span class="title">网上支付：</span><span class="text"><img class="img-icon" src="../../assets/images/wxPay-mini.png">微信支付</span><span class="text"><img class="img-icon" src="../../assets/images/aliPay-mini.png">支付宝</span></div>
+      <div class="invoice-list">
+        <div>
+          <span class="title">发票：</span>
+          <el-radio-group v-model="invoiceTag">
+            <el-radio :label="0">不开发票</el-radio>
+            <el-radio :label="3">普通发票<span>（统一默认开具电子发票）</span></el-radio>
+            <el-radio :label="4">增值税专用发票</el-radio>
           </el-radio-group>
-      </div>
-      <div class="invoice-content" v-if="orderForm.invoiceType === 1 && invoiceTag === 3"><span>发票内容：</span><span>商品明细</span></div>
-      <p v-if="invoiceTag === 4" style="padding-left: 60px">如需开增值税发票，请联系在线客服，或拨打400-705-8885</p>
-      <div class="invoice-wrap" v-if="orderForm.invoiceType === 2 && (invoiceTag === 3 || invoiceTag === 4)">
-        <div class="invoice fl" :class="{active: item.invoiceId === orderForm.invoiceId  }"  v-for="(item, index) in invoiceList" :key="index" @click="chooseInvoice(item.invoiceId, item.invoiceType)">
-         <i class="el-icon el-icon-tickets"></i>
-          <p class="name">普通发票</p>
-          <p class="phone">发票抬头：{{item.title}}</p>
-          <p class="detail">税号{{item.taxNumber}}</p>
-          <div class="handle">
-             <a href="javascript:;" class="delete fr" @click.stop="deleteInvoice({invoiceId: item.invoiceId})"><i class="el-icon el-icon-delete"></i>删除</a>
-            <a href="javascript:;" class="edit fr" @click.stop="editInvoice(item)" ><i class="el- icon el-icon-edit-outline"></i> 编辑</a>
+        </div>
+        <div class="invoice-title" v-if="invoiceTag === 3">
+            <span>发票抬头：</span>
+            <el-radio-group v-model="orderForm.invoiceType">
+              <el-radio :label="1">个人</el-radio>
+              <el-radio :label="2">公司</el-radio>
+            </el-radio-group>
+        </div>
+        <div class="invoice-content" v-if="orderForm.invoiceType === 1 && invoiceTag === 3"><span>发票内容：</span><span>商品明细</span></div>
+        <p v-if="invoiceTag === 4" style="padding-left: 75px">如需开增值税发票，请联系在线客服，或拨打400-705-8885</p>
+        <div class="invoice-wrap" v-if="orderForm.invoiceType === 2 && invoiceTag === 3">
+          <div class="invoice fl" :class="{active: item.invoiceId === orderForm.invoiceId  }"  v-for="(item, index) in invoiceList" :key="index" @click="chooseInvoice(item.invoiceId, item.invoiceType)">
+          <i class="el-icon el-icon-tickets"></i>
+            <p class="name">公司发票</p>
+            <div class="phone"><span class="fl">公司名称：</span><p style="paddingLeft:60px">{{item.title}}</p></div>
+            <div class="detail"><span class="fl">纳锐人识别号：</span><p style="paddingLeft:84px">{{item.taxNumber}}</p></div>
+            <div class="handle">
+              <!-- <i class="el-icon el-icon-delete"></i> <i class="el- icon el-icon-edit-outline"></i>-->
+              <a href="javascript:;" class="delete fr" @click.stop="deleteInvoice({invoiceId: item.invoiceId})">删除</a>
+              <a href="javascript:;" class="edit fr" @click.stop="editInvoice(item)" > 编辑</a>
+            </div>
+          </div>
+          <div class="invoice fl" @click="openInvoiceDialog">
+            添加新发票信息
           </div>
         </div>
-         <div class="invoice fl" @click="openInvoiceDialog">
-           添加新发票信息
-         </div>
       </div>
     </div>
     <div class="panel my-goods">
@@ -135,6 +145,15 @@ export default {
         itemStyleId: '',
         num: ''
       },
+      wrapindex: 0,
+      addressWrap: [{
+        height: '153px',
+        text: '显示全部地址'
+      },
+      {
+        height: 'auto',
+        text: '收起地址'
+      }],
       invoiceTag: 0, // 是否开发票
       addressList: [],
       addEdit: false, // 用来区分是新增还是编辑
@@ -214,6 +233,11 @@ export default {
       if (this.invoiceTag === 3 && this.orderForm.invoiceType === 1) {
         delete this.orderForm.invoiceId;
       }
+      // 增值税发票时的处理，删掉invoiceType
+      if (this.invoiceTag === 4) {
+        this.orderForm.invoiceType = 3;
+        delete this.orderForm.invoiceId;
+      }
       this.$fetchPost({
         url: this.$api.ORDER_USER_CART,
         data: this.orderForm
@@ -276,7 +300,8 @@ export default {
       getInvoiceList().then(res => {
         this.invoiceList = res.data;
         if (invoiceId) {
-          this.orderForm.invoiceId = this.invoiceList.length ? this.invoiceList[0].invoiceId : '';
+          this.orderForm.invoiceId = invoiceId.data.invoiceId;
+          // this.orderForm.invoiceId = this.invoiceList.length ? this.invoiceList[0].invoiceId : '';
         }
       });
     },
@@ -298,10 +323,10 @@ export default {
           this.orderForm.addressId = this.addressList.length ? this.addressList[0].addressId : '';
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消删除'
+        // });
       });
     },
     // 删除发票
@@ -322,10 +347,10 @@ export default {
           this.orderForm.invoiceId = this.invoiceList.length ? this.invoiceList[0].invoiceId : '';
         });
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消删除'
+        // });
       });
     },
     // 选择收货地址
@@ -357,6 +382,10 @@ export default {
       }).then(res => {
         this.addressList = res.data.addressList;
       });
+    },
+    // 展开全部
+    visibleAllAddress() {
+      this.wrapindex = this.wrapindex === 0 ? 1 : 0;
     }
   },
   components: {
@@ -386,15 +415,27 @@ export default {
       margin-bottom: 10px;
     }
     .address-wrap{
+      height: 153px;
       overflow: hidden;
+    }
+    .note{
+      line-height: 54px;
+      color: @base-color;
+      overflow: hidden;
+      span{
+        cursor: pointer;
+      }
+      a{
+        color: @base-color;
+      }
     }
     .address{
       position: relative;
       width: 356px;
-      height: 132px;
+      height: 153px;
       color: #888888;
       padding: 10px 20px 10px 30px;
-      border: 1px solid #eaeaea;
+      border: 2px solid #eaeaea;
       margin-right: 16px;
       margin-bottom: 10px;
       box-sizing: border-box;
@@ -403,27 +444,47 @@ export default {
         top: 10px;
         left: 11px;
       }
+      .isDefault{
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 4px;
+        color: #fff;
+        background: #cccccc;
+      }
       .name{
         line-height: 1;
         margin-bottom: 15px;
+        span{
+          margin-left: 10px;
+        }
       }
       .phone,.detail{
         font-size: 12px;
         line-height: 22px;
+        span:last-child{
+          margin-left: 10px;
+        }
+      }
+      .detail{
+        height: 44px;
+        overflow: hidden;
       }
       .el-checkbox{
         color: #888;
       }
       .handle{
+        position: absolute;
+        bottom: 10px;
         margin-top: 16px;
         .delete, .edit{
-         color: #888;
+         color: @base-color;
           line-height: 20px;
           i{
             margin-right: 4px;
           }
           &:hover{
-            color: @font-color;
+            color: @hover-color;
           }
         }
         .delete{
@@ -435,12 +496,21 @@ export default {
         .name, .phone, .detail {
           color: @font-color;
         }
+        &:after{
+          position: absolute;
+          content: "";
+          width: 31px;
+          height: 31px;
+          bottom: 0;
+          right: 0;
+          background: url(../../assets/images/active.png)
+        }
       }
       &:nth-of-type(3n+3){
         margin-right: 0
       }
-      &:last-child{
-        line-height: 132px;
+      &.no-address{
+        line-height: 153px;
         text-align:center;
         padding:0;
         color: #888888;
@@ -449,6 +519,7 @@ export default {
     }
   }
   .delivery-type, .pay-type{
+    margin: 30px 0;
     line-height: 1;
     .title{
       color: #888;
@@ -464,9 +535,9 @@ export default {
   .invoice-list{
     .title{
       color: #888;
-      line-height: 40px;
+      line-height: 30px;
       margin-bottom: 10px;
-      margin-right: 15px;
+      margin-right: 30px;
     }
     .invoice-title, .invoice-content{
       color: #888;
@@ -480,7 +551,7 @@ export default {
     .invoice{
       position: relative;
       width: 356px;
-      height: 136px;
+      height: 153px;
       color: #888;
       padding: 10px 20px 10px 30px;
       border: 1px solid #eaeaea;
@@ -500,6 +571,10 @@ export default {
         font-size: 12px;
         line-height: 22px;
       }
+      .phone{
+        height: 44px;
+        overflow: hidden;
+      }
       .handle{
         overflow: hidden;
         margin-top: 16px;
@@ -511,7 +586,7 @@ export default {
           }
         }
         .delete{
-          margin-left: 12px;
+          margin-left: 35px;
         }
       }
       &.active{
@@ -524,7 +599,7 @@ export default {
         margin-right: 0
       }
       &:last-child{
-        line-height: 120px;
+        line-height: 153px;
         text-align:center;
         padding:0;
         color: #888888;
@@ -540,7 +615,12 @@ export default {
       #bg-img;
     }
     .name{
-      line-height: 126px;
+      display: table-cell;
+        line-height: 1.5;
+         height: 126px;
+        vertical-align: middle;
+      // padding-left: 28px;
+      // line-height: 126px;
     }
     .pay-wrap{
       p{

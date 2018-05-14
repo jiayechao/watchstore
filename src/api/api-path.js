@@ -26,7 +26,7 @@ const path = {
   ADDRESS_LIST: `${api}/wat/addressList`, // 我的收货地址列表
   GET_ORDER_LIST: `${api}/wat/getOrderList`, // 我的订单列表
   ADD_ADDRESS: `${api}/wat/addAddress`, // 添加收货地址
-  UPDATE_ADDRESS: `${api}/wat/updateAddress`, // 修改收获地址
+  UPDATE_ADDRESS: `${api}/wat/updateAddress`, // 修改收获地址nprogress
   DEL_ADDRESS: `${api}/wat/delAddress`, // 删除收货地址
   RESET_DEFAULT_ADDRESS: `${api}/wat/resetDefaultAddress`, // 设置默认收货地址
   INVOICE_LIST: `${api}/wat/invoiceList`, // 发票列表
@@ -38,6 +38,7 @@ const path = {
   QUERY_PAY_STATUS: `${api}/wat/queryPayStatus`, // 查询支付状态
   GET_ORDER_DETAIL: `${api}/wat/getOrderDetail`, // 查询订单详情
   GET_MY_BASE_INFO: `${api}/wat/getMyBaseInfo`, // 获取我的基本信息
+  UPDATE_USER_INFO: `${api}/wat/updateUserInfo`, // 修改用户信息
   UPDATE_NICKNAME: `${api}/wat/updateNickname`, // 修改昵称
   UPDATE_PWD: `${api}/wat/updatePwd`, // 修改密码
   RESET_PWD: `${api}/wat/resetPwd`, // 重置密码
@@ -45,7 +46,8 @@ const path = {
   QUERY_DISPACH_INFO: `${api}/wat/queryDispachInfo`, // 查看物流
   APPLY_AFTER_SALES: `${api}/wat/applyAfterSales`, // 申请售后
   GET_AFTER_SALES_INFO: `${api}/wat/getAfterSalesInfo`, // 查看售后
-  FINISH_ORDER: `${api}/wat/finishOrder` // 确认收货
+  FINISH_ORDER: `${api}/wat/finishOrder`, // 确认收货
+  GET__PRE_AFTER_APPLY_INFO: `${api}/wat/getPreAfterSalesApplyInfo` // 查看售后
 };
 
 export default path;

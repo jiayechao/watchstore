@@ -1,11 +1,12 @@
 <template>
   <div class="main-wrap">
     <div class="panel order-list">
-      <p class="title">订单号：{{orderDetail.orderNo}}</p>
-      <div class="message">
-        <p v-if="stateCode === 10"><img src="../../assets/images/cg.png" alt=""> 订单提交成功</p>
-        <p v-else><img src="../../assets/images/cg.png" alt=""> {{stateDesc}}</p>
-        </div>
+      <p class="title">
+        <img src="../../assets/images/order-success.png" alt="">
+        <span v-if="stateCode === 10">订单提交成功，请尽快付款！</span>
+        <span v-else>{{stateDesc}}</span>
+          订单号：{{orderDetail.orderNo}}
+        </p>
     </div>
     <div class="panel pay-list" v-if="orderDetail.orderState === 0 || orderDetail.orderState === 7">
       <p class="title">网上支付</p>
@@ -139,9 +140,12 @@ export default {
       box-shadow: 0 0 10px  0 #ccc;
     }
     .order-list{
+       padding: 20px 50px;
       .title{
         line-height: 1;
-        margin-bottom: 34px;
+        img{
+          vertical-align: middle;
+        }
       }
       .message{
         line-height: 43px;

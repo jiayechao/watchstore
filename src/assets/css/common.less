@@ -67,6 +67,9 @@ input, button,a{
 .el-table--enable-row-hover .el-table__body tr:hover>td{
   background:#fff!important;
 }
+.myAddList.el-table--enable-row-hover .el-table__body tr:hover>td{
+  background:#f5f7fa!important;
+}
 // 订单列表的表头覆盖
 .order_list-wrap .el-table__header-wrapper{
   display:none;
@@ -144,6 +147,11 @@ input, button,a{
     color: #333!important;
   }
 }
+//小购物车数字显示
+.el-badge__content.is-fixed{
+  top:16px!important;
+  right: 20px!important;
+}
 /*计数器样式覆盖*/
 .el-input-number{
   .el-input-number__decrease,.el-input-number__increase{
@@ -156,7 +164,10 @@ input, button,a{
   .el-input__inner{
     border:0!important;
   }
-
+  &.is-disabled .el-input-number__decrease, &.is-disabled .el-input-number__increase{
+    border-color: #e4e7ed!important;
+    color: #e4e7ed!important;
+  }
 }
 /* 覆盖表单 */
 .sign-form{
@@ -252,6 +263,24 @@ input, button,a{
   }
 }
 .el-form-item.is-success .el-input__inner, .el-form-item.is-success .el-input__inner:focus, .el-form-item.is-success .el-textarea__inner, .el-form-item.is-success .el-textarea__inner:focus{
-  border-color: #dcdfe6
+  border-color: #dcdfe6!important;
 }
-
+/* 分页的样式覆盖 */
+.el-pagination{
+  .number{
+    font-weight: normal;
+    &:hover{
+      color: #333!important;
+    }
+    &.active{
+      color: #333!important;
+      border:  1px solid #999;
+    }
+  }
+}
+// 面包屑样式覆盖
+.el-breadcrumb__item{
+  .el-breadcrumb__inner.is-link{
+    color: @base-color!important;
+  }
+}

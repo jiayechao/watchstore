@@ -1,6 +1,6 @@
 <template>
-  <el-form :model="invoiceFormData" :rules="rules" ref="invoiceForm" label-width="92px" class="invoiceForm">
-    <el-form-item label="发票类型" >
+  <el-form :model="invoiceFormData" :rules="rules" ref="invoiceForm" label-width="122px" class="invoiceForm">
+    <!-- <el-form-item label="发票类型" >
      <el-select v-model="mold" placeholder="请选择">
           <el-option
             v-for="item in molds"
@@ -9,22 +9,23 @@
             :value="item.value">
           </el-option>
         </el-select>
-    </el-form-item>
-    <el-form-item label="发票内容" >
-        <el-select v-model="content" placeholder="请选择">
+    </el-form-item> -->
+    <el-form-item label="发票内容：" >
+      <span>商品明细</span>
+        <!-- <el-select v-model="content" placeholder="请选择">
           <el-option
             v-for="item in contents"
             :key="item.value"
             :label="item.label"
             :value="item.value">
           </el-option>
-        </el-select>
+        </el-select> -->
       </el-form-item>
-    <el-form-item label="发票抬头" prop="title">
-      <el-input v-model="invoiceFormData.title"></el-input>
+    <el-form-item label="公司名称：" prop="title">
+      <el-input v-model="invoiceFormData.title" maxlength="20"></el-input>
     </el-form-item>
-    <el-form-item label="发票税号" prop="taxNumber">
-      <el-input v-model="invoiceFormData.taxNumber"></el-input>
+    <el-form-item label="纳税人识别号：" prop="taxNumber">
+      <el-input v-model="invoiceFormData.taxNumber"  maxlength="20"></el-input>
     </el-form-item>
     <el-form-item label="">
       <el-checkbox v-model="invoiceFormData.isDefault" :true-label="1" :false-label="0" class="has_checked"  name="type" label="设置为默认发票"></el-checkbox>
@@ -96,7 +97,7 @@ export default {
           console.log('invoiceEdit', this.invoiceEdit);
           if (this.invoiceEdit) {
             updateInvoice(this.invoiceFormData).then(res => {
-              this.$emit('closeInvoiceDialog');
+              this.$emit('closeInvoiceDialog', {data: {invoiceId: this.invoiceFormData.invoiceId}});
               this.$refs[form].resetFields();
             });
           } else {

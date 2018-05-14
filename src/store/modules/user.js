@@ -39,7 +39,12 @@ const user = {
           }).then(res => {
             const data = res.data;
             tools.setItem('userInfo', data, 1);
-            commit('SET_TOKEN', data.token);
+            if (data.token) {
+              commit('SET_TOKEN', data.token);
+            } else {
+              data.token = this.state.token;
+            }
+            // commit('SET_TOKEN', data.token);
             commit('SET_MOBILE', data.mobile);
             commit('SET_HEADIMGURL', data.headImgUrl);
             commit('SET_USERNAME', data.username);

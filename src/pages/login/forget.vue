@@ -127,7 +127,7 @@ export default {
             });
             // 将返回信息存到localstorage
             this.$tools.setItem('userInfo', res.data, true);
-            setTimeout(function() {
+            setTimeout(() => {
               this.$router.push('/');
             }, 3000);
           });

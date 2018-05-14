@@ -63,7 +63,7 @@ export default {
         console.log(valid);
         if (valid) {
           this.$store.dispatch('LoginByMobile', this.form)
-            .then(() => {
+            .then(res => {
               this.$router.push(this.$route.query.redirect || '/');
             // this.showDialog = true;
             });
@@ -133,7 +133,7 @@ export default {
 }
  .el-form{
    width: 423px;
-   background: rgba(255, 255, 255, 0.5);
+   background: rgba(255, 255, 255, 1);
    margin: 0 auto;
    padding: 45px 50px 82px;
    box-sizing: border-box;
@@ -145,7 +145,7 @@ export default {
      margin-bottom: 52px;
    }
    .el-form-item{
-     border: 1px solid rgba(255,255,255,0.5);
+     border: 1px solid #e5e5e5;
      margin-bottom: 25px;
      .svg-icon{
        margin-right: 0;

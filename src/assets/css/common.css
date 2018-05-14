@@ -35,20 +35,52 @@ button,
 a {
   outline: 0;
 }
+/*小图标，svg, 字体*/
+.el-icon,
+.img-icon,
+.svg-icon {
+  margin-right: 8px;
+}
 /* 按钮，线框等覆盖样式*/
 .custom-bg {
   background: #14B7F5;
   border-color: #14B7F5;
 }
 .custom-bg:hover,
-.custom-bg:active {
+.custom-bg:active,
+.custom-bg:focus {
   background: #52caf8;
   border-color: #52caf8;
 }
+.custom-height {
+  padding: 7px 20px;
+}
+.el-table .cell {
+  color: #333;
+  font-weight: normal;
+}
+.my-goods .el-table th:nth-child(1) .cell {
+  padding-left: 40px;
+}
+.el-table--enable-row-hover .el-table__body tr:hover > td {
+  background: #fff!important;
+}
+.order_list-wrap .el-table__header-wrapper {
+  display: none;
+}
+.service-wrap .el-table th {
+  padding: 4px 0;
+  background: #f2f2f2;
+}
+.service-wrap .el-table th .cell {
+  color: #888 !important;
+}
 .cart-drop {
+  max-height: 400px;
   padding: 0;
   box-sizing: border-box;
   border: 0;
+  overflow: auto;
 }
 /*banner图的样式覆盖*/
 .el-carousel__indicators {
@@ -66,6 +98,60 @@ a {
   border-radius: 50%;
   background: transparent;
   border: 1px solid #ffabbe;
+}
+/* 多选框checkbox覆盖*/
+.el-checkbox__inner:hover {
+  border-color: #666!important;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-focus .el-checkbox__inner {
+  background-color: #fff!important;
+  border-color: #666!important;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner:after,
+.el-checkbox__input.is-focus .el-checkbox__inner:after {
+  border-color: #666!important;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #666!important;
+}
+/* 单选框radio覆盖 */
+.el-radio__inner:hover {
+  border-color: #333!important;
+}
+.el-radio__label {
+  color: #888!important;
+}
+.el-radio__input.is-checked .el-radio__inner {
+  border-color: #333!important;
+  background: #fff!important;
+}
+.el-radio__input.is-checked .el-radio__inner:after {
+  background: #2b9b3b!important;
+}
+.el-radio__input.is-checked + .el-radio__label {
+  color: #333!important;
+}
+.el-badge__content.is-fixed {
+  top: 16px!important;
+  right: 20px!important;
+}
+/*计数器样式覆盖*/
+.el-input-number .el-input-number__decrease,
+.el-input-number .el-input-number__increase {
+  color: #666!important;
+  border-radius: 0!important;
+  border: 1px solid #888!important;
+  background: #fff!important;
+  top: 0!important;
+}
+.el-input-number .el-input__inner {
+  border: 0!important;
+}
+.el-input-number.is-disabled .el-input-number__decrease,
+.el-input-number.is-disabled .el-input-number__increase {
+  border-color: #e4e7ed!important;
+  color: #e4e7ed!important;
 }
 /* 覆盖表单 */
 .sign-form .el-input__inner {
@@ -93,16 +179,66 @@ a {
 .sign-form .protocol .el-form-item__error {
   padding-left: 24px;
 }
-.sign-form .has_checked .el-checkbox__inner:hover {
-  border-color: #666;
+.addressForm .el-form-item__label {
+  text-align: left;
 }
-.sign-form .has_checked .el-checkbox__input.is-checked .el-checkbox__inner,
-.sign-form .has_checked .el-checkbox__input.is-focus .el-checkbox__inner {
-  background-color: #fff;
-  border-color: #666;
+.passwordForm .el-input__inner {
+  padding-left: 10px;
+  border: 0;
 }
-.sign-form .has_checked .el-checkbox__input.is-checked .el-checkbox__inner:after,
-.sign-form .has_checked .el-checkbox__input.is-focus .el-checkbox__inner:after {
-  border-color: #666;
+.passwordForm .el-form-item__label {
+  padding: 0;
+}
+.passwordForm .el-form-item__error {
+  padding-left: 10px;
+}
+.serviceForm .el-form-item.is-required .el-form-item__label:before {
+  float: left;
+  content: '';
+}
+/* 新建地址的弹层*/
+.el-dialog {
+  padding: 0 30px;
+}
+.el-dialog .el-dialog__headerbtn {
+  right: 50px;
+}
+.el-dialog .el-dialog__headerbtn .el-icon-close {
+  color: #333;
+}
+.el-dialog .el-dialog__header {
+  margin: 0 -30px;
+  padding: 20px 50px 10px;
+  background: #f2f2f2;
+}
+.el-dialog .el-dialog__header .el-dialog__title {
+  font-size: 14px;
+}
+.el-dialog .el-dialog__footer {
+  padding-top: 0;
+  padding-bottom: 30px;
+}
+.el-dialog .dialog-footer {
+  text-align: center;
+}
+.address-dialog.hasCancel .btn-wrap .el-form-item__content,
+.invoice-dialog.hasCancel .btn-wrap .el-form-item__content {
+  text-align: center;
+  margin: 0!important;
+}
+.address-dialog .el-col-120,
+.invoice-dialog .el-col-120 {
+  width: 120px;
+  margin-right: 7px;
+}
+.address-dialog input,
+.invoice-dialog input {
+  border-radius: 0;
+}
+.el-form-item.is-success .el-input__inner,
+.el-form-item.is-success .el-input__inner:focus,
+.el-form-item.is-success .el-textarea__inner,
+.el-form-item.is-success .el-textarea__inner:focus {
+  border-color: #dcdfe6!important;
 }
 /*# sourceMappingURL=common.css.map */

@@ -1,6 +1,9 @@
 <template>
 <div>
-  <p class="address"><i class="el-icon el-icon-location-outline"></i>收货地址：{{logisticsData.province}}{{logisticsData.city}}{{logisticsData.area}}{{logisticsData.addressDetail}}</p>
+  <div class="address">
+    <span class="fl"><i class="el-icon el-icon-location-outline"></i>收货地址：</span>
+    <p class="text">{{logisticsData.province}}{{logisticsData.city}}{{logisticsData.area}}{{logisticsData.addressDetail}}</p>
+    </div>
   <div class="step-wrap">
       <div class="step-item fl" :class="{achieve: index === 0}"  v-for="(item, index) in logisticsData.data" :key="index">
           <p class="step-time fl">{{item.time | moments}}</p>
@@ -30,8 +33,12 @@ export default {
 <style lang="less" scoped>
 .address{
   color:#333;
-  padding-left: 90px;
-  margin-bottom: 20px;
+  margin: -30px -50px 20px;
+  padding: 20px 50px;
+  background: #fafafa;
+  .text{
+    padding-left: 94px;
+  }
 }
 .step-wrap{
   overflow: hidden;

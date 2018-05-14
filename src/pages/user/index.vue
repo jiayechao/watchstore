@@ -6,7 +6,7 @@
     <ul>
       <li :class="{active: classTag.indexOf('info') !== -1}"><router-link  :to="'/user/'+userId+'/info'"><svg-icon class="svg-icon" icon-class="my" />用户信息</router-link></li>
       <li :class="{active: classTag.indexOf('order') !== -1 || classTag.indexOf('service') !== -1}"><router-link  :to="'/user/'+userId+'/order_list'"><i class="el-icon el-icon-tickets"></i>我的订单</router-link></li>
-      <li :class="{active: classTag.indexOf('address') !== -1}"><router-link  :to="'/user/'+userId+'/address'"><i class="el-icon el-icon-location-outline"></i>收获地址</router-link></li>
+      <li :class="{active: classTag.indexOf('address') !== -1}"><router-link  :to="'/user/'+userId+'/address'"><i class="el-icon el-icon-location-outline"></i>收货地址</router-link></li>
     </ul>
   </div>
   <div class="split"></div>

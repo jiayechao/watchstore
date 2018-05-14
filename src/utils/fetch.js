@@ -14,6 +14,7 @@ let initOptions = {
     platform: 5
   }
 };
+
 function getUser() {
   initOptions.data.userId = store.getters.userId;
   initOptions.data.token = store.getters.token;
@@ -34,9 +35,7 @@ export function fetch(options, load, time = 500, state = 'err') {
   // 打开loading
   // if (load === 0) tools.indicator();
   return (axios.create({
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     // 超时
     timeout: 15 * 1000
   }))(options).then(res => {
@@ -45,6 +44,7 @@ export function fetch(options, load, time = 500, state = 'err') {
       return Promise.resolve(res.data);
     }
     if (res.data.code !== 0) {
+      store.dispatch('closeLoading');
       if (res.data.code > 0 && res.data.code < 8999) {
         if (res.data.code === 10 || res.data.code === 6) { // toke无效，验证不通过，需要重新登录，跳转到登录页
           // 这里的注释是以后如果需要用户决定跳转的话可以用
@@ -69,15 +69,24 @@ export function fetch(options, load, time = 500, state = 'err') {
       }
       // 这里针对返回失败的数据做一个处理，传递错误到catch
       return Promise.reject(res.data);
+    } else {
+      store.dispatch('closeLoading');
+      // console.log(1);
+      return Promise.resolve(res.data);
     }
-    store.dispatch('closeLoading');
-    return Promise.resolve(res.data);
   }).catch(err => {
-    // Message({
-    //   message: err,
-    //   type: 'error'
-    // });
     store.dispatch('closeLoading');
-    return Promise.reject(err); // 继续传递错误，可以让单个的post捕捉到
+    // 这里针对断开网络的提示做一个判断，要在正式线测试
+    if (err.code) {
+      // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+      return Promise.reject(err); // 继续传递错误，可以让单个的post捕捉到
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      Message({
+        message: '网络链接超时，请检查网络',
+        type: 'error'
+      });
+      return Promise.reject(err);
+    }
   });
 }

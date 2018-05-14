@@ -3,7 +3,7 @@ import moment from 'moment';
 // 时间过滤
 const moments = (value, format) => {
   if (!value) return '';
-  return moment(value).format(format ? format : 'YYYY-MM-DD hh:mm:ss');
+  return moment(value).format(format ? format : 'YYYY-MM-DD HH:mm:ss');
 };
 const countDown = (value, format) => {
   if (!value) return '';

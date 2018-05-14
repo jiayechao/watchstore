@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+
 const _import = require('./_import_' + process.env.NODE_ENV);
 
 Vue.use(Router);
@@ -9,19 +10,33 @@ export default new Router({
   base: '/watch-pc',
   // 使用history模式不会有#号
   mode: 'history',
-  scrollBehavior (to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    } else {
-      return { x: 0, y: 0 };
-    }
-  },
   routes: [
+    {path: '/', redirect: '/home'},
+    {path: '*', redirect: '/404'},
+    {path: '/404', component: _import('404'), name: '404'},
     {
-      path: '/404', component: _import('404'), name: '404'},
-    {
-      path: '/', // 首页
+      path: '/home',
       name: '首页',
+      component: () => import('../pages/home/index.vue')
+    },
+    {
+      path: '/s-series',
+      name: 'S系列',
+      component: () => import('../pages/s-series/index.vue')
+    },
+    {
+      path: '/x-series',
+      name: 'X系列',
+      component: () => import('../pages/x-series/index.vue')
+    },
+    {
+      path: '/brand',
+      name: '品牌',
+      component: () => import('../pages/brand/index.vue')
+    },
+    {
+      path: '/shop', // 商城
+      name: '商城',
       component: _import('index')
     },
     {
@@ -135,6 +150,30 @@ export default new Router({
         }
       ]
     },
-    { path: '*', redirect: '/404' }
+    {
+      path: '/about',
+      name: '关于我们',
+      component: () => import('../pages/common/about.vue')
+    },
+    {
+      path: '/contact',
+      name: '联系我们',
+      component: () => import('../pages/common/contact.vue')
+    },
+    {
+      path: '/commonProblem',
+      name: '常见问题',
+      component: () => import('../pages/common/commonProblem.vue')
+    },
+    {
+      path: '/afterService',
+      name: '售后服务',
+      component: () => import('../pages/common/afterService.vue')
+    },
+    {
+      path: '/salesNetwork',
+      name: '销售网络',
+      component: () => import('../pages/common/salesNetwork.vue')
+    }
   ]
 });

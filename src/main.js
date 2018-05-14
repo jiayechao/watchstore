@@ -36,6 +36,10 @@ router.beforeEach((to, from, next) => {
       store.dispatch('GetUserInfo');
     }
     if (to.path === '/signin') {
+      // 从首页进入的登陆成功后的页面返回时会持续加载
+      if (from.path === '/home') {
+        next();
+      }
       next({ path: '/' });
     } else {
       next();
@@ -51,6 +55,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach(() => {
   NProgress.done();
+  document.getElementById('app').scrollTop = 0;
 });
 
 // vue组件原型调用方法
